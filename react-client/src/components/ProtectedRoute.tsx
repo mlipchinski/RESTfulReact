@@ -13,6 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
                 justifyContent: 'center',
                 alignContent: 'center',
                 height: '100vh',
+                width: '100%'
             }}>
                 <div>Loading...</div>
             </div>

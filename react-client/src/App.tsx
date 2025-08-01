@@ -1,34 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { Navigate, Route, Routes, BrowserRouter } from 'react-router-dom'
+import Login from './components/Login';
+import Register from './components/Register'
+import ProtectedRoute from './components/ProtectedRoute'
+import Home from './components/Home'
 
-function App() {
-  const [count, setCount] = useState(0)
+const RootRedirect: React.FC = () => {
+  const { isAuthenticated, loading } = useAuth();
 
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
+  return <Navigate to={isAuthenticated ? '/home' : 'login'} replace />;
+}
+
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className='App'>
+          <Routes>
+            <Route path='/' element={<RootRedirect />}></Route>
+            <Route path='/login' element={<Login />}></Route>
+            <Route path='/register' element={<Register />}></Route>
+            <Route
+              path='/home'
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route path='*' element={<Navigate to='/' replace />} />
+          </Routes>
+        </div>
+        
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
