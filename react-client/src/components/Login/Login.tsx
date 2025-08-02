@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { ApiError, LoginCredentials } from "@/types";
 import { Link, useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
-import './Auth.css';
+import '../Auth.css'
 import { authAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import useApi from "@/hooks/useApi"; //Hook import

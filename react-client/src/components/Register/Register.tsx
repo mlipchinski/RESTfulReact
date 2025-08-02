@@ -5,6 +5,7 @@ import { AuthResponse, type ApiError, type RegisterData } from "@/types";
 import { authAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import useApi from "@/hooks/useApi";
+import '../Auth.css'
 
 interface RegisterFormData extends RegisterData {
     confirmPassword: string;
