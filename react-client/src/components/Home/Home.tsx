@@ -1,6 +1,6 @@
 import type React from "react";
-import { useAuth } from "../contexts/AuthContext";
 import './Home.css';
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home: React.FC = () => { 
     const { user, logout } = useAuth();

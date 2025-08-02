@@ -2,10 +2,10 @@
 import './App.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Navigate, Route, Routes, BrowserRouter } from 'react-router-dom'
-import Login from './components/Login';
-import Register from './components/Register'
-import ProtectedRoute from './components/ProtectedRoute'
-import Home from './components/Home'
+import Login from './components/Login/Login';
+import Register from './components/Register/Register'
+import ProtectedRoute from './components/Route/ProtectedRoute'
+import Home from './components/Home/Home'
 
 const RootRedirect: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();

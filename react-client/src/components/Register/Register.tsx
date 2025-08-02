@@ -1,19 +1,22 @@
-import type React from "react";
-import { useState } from "react";
-import type { ApiError, LoginCredentials } from "../types";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { authAPI } from "../services/api";
 import type { AxiosError } from "axios";
-import './Auth.css';
+import type { ApiError, RegisterData } from "@/types";
+import { authAPI } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-const Login: React.FC = () => {
-    const [formData, setFormData] = useState<LoginCredentials>({
+interface RegisterFormData extends RegisterData {
+    confirmPassword: string;
+}
+
+const Register: React.FC = () => {
+    const [formData, setFormData] = useState<RegisterFormData>({
         username: '',
         password: '',
+        confirmPassword: '',
     });
     const [error, setError] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -21,10 +24,9 @@ const Login: React.FC = () => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
-        });
-        //Clear error when user stars typing 
-        if (error)
-            setError('');
+        })
+
+        if (error) setError('');
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -32,28 +34,46 @@ const Login: React.FC = () => {
         setLoading(true);
         setError('');
 
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            setLoading(false);
+            return Promise.reject(error);
+        }
+
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters long');
+            setLoading(false);
+            return Promise.reject(error);
+        }
+
         try {
-            const response = await authAPI.login(formData);
+            const registerData: RegisterData = {
+                username: formData.username,
+                password: formData.confirmPassword,
+            }
+
+            const response = await authAPI.register(registerData);
+
             login(response.token, response.user);
             navigate('/home');
         } catch (err) {
             const axiosError = err as AxiosError<ApiError>;
-            setError(axiosError.response?.data?.error || 'Login failed. Please try again');
+            setError(axiosError.response?.data?.error || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="auth-container">
             <div className="auth-form">
-                <h2>Login</h2>
+                <h2>Create Account</h2>
                 {error && <div className="error-message">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="username">Username:</label>
-                        <input
+                        <label htmlFor="userName">Username:</label>
+                        <input 
                             type="text"
                             id="username"
                             name="username"
@@ -77,22 +97,35 @@ const Login: React.FC = () => {
                         />
                     </div>
 
+                    <div className="form-group">
+                        <label htmlFor="confirmPassword">Confirm Password:</label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        />
+                    </div>
+
                     <button
                         type="submit"
                         className="auth-button"
-                        disabled={loading} 
+                        disabled={loading}
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? 'Creating Account...' : 'Register'}
                     </button>
                 </form>
-
                 <p className="auth-link">
-                    Don't have an account? <Link to="/register">Register here</Link>
+                    Already have an account? <Link to="/login">Login here</Link>
                 </p>
             </div>
         </div>
     );
+
+
 }
 
-export default Login;
-
+export default Register;
