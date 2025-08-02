@@ -1,7 +1,7 @@
 import React from "react";
 import { createContext, useContext, useState, useEffect } from 'react';
-import * as types from '../types';
-import { tokenUtils } from "../services/api";
+import * as types from '@/types';
+import { tokenUtils } from "@/services/api";
 
 const AuthContext = createContext<types.AuthContextType | undefined>(undefined);
 
