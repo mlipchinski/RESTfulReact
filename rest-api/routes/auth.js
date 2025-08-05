@@ -1,11 +1,10 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const router = express.Router();
-const { authenticateToken } = require('../middleware/auth')
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { authenticateToken } from '../middleware/auth.js';
+import userService from '../services/userService.js';
 
-//In memory users
-const users = [];
+const router = express.Router();
 
 //Helper function for JWT token generation
 const generateToken = (user) => {
@@ -37,27 +36,8 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        //Check if users exists
-        const existingUser = users.find(user => user.username === username);
-        if (existingUser) {
-            return res.status(400).json({
-                error: 'User already exists'
-            })
-        }
-
-        //Hash the password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        //Create the user
-        const newUser = {
-            id: users.length + 1,
-            username,
-            password: hashedPassword,
-            createdAt: new Date()
-        };
-
-        users.push(newUser);
+        //Create using prisma orm
+        const newUser = await userService.createUser({ username, password });
 
         //Generate token
         const token = generateToken(newUser);
@@ -88,20 +68,23 @@ router.post('/login', async (req, res) => {
         if (!username || !password) {
             return res.status(400).json({
                 error: 'Username and password required',
-                
+
             });
         }
 
         //Find user
-        const user = users.find(user => user.username === username);
+        // const user = users.find(user => user.username === username);
+        const user = await userService.findUserByUsername(username);
         if (!user) {
             return res.status(400).json({
                 error: 'Invalid credentials'
             })
         }
 
+
         //Check password
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        //const isValidPassword = await bcrypt.compare(password, user.password);
+        const isValidPassword = await userService.verifyUserPassowrd(password, user.password);
         if (!isValidPassword) {
             return res.status(400).json({
                 error: 'Invalid password'
@@ -126,11 +109,12 @@ router.post('/login', async (req, res) => {
             error: 'Internal server error'
         });
     }
-    
+
 });
 
 router.get('/me', authenticateToken, (req, res) => {
-    const user = users.find(user => user.id === req.user.id);
+    //const user = users.find(user => user.id === req.user.id);
+    const user = userService.findUserById(req.user.id);
 
     if (!user) {
         return res.status(400).json({
@@ -149,4 +133,4 @@ router.get('/me', authenticateToken, (req, res) => {
     )
 });
 
-module.exports = router;
+export default router;
