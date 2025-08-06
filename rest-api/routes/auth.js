@@ -81,10 +81,11 @@ router.post('/login', async (req, res) => {
             })
         }
 
+        //Hash password
+        const hashedPassword = await userService.hashedPassword(password);
 
         //Check password
-        //const isValidPassword = await bcrypt.compare(password, user.password);
-        const isValidPassword = await userService.verifyUserPassowrd(password, user.password);
+        const isValidPassword = await userService.verifyUserPassowrd(password, hashedPassword);
         if (!isValidPassword) {
             return res.status(400).json({
                 error: 'Invalid password'

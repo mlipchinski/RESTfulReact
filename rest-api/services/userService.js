@@ -9,9 +9,7 @@ const createUser = async (userData) => {
         throw new Error('Username already exists!');
     }
 
-    //Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
         data: {
@@ -29,6 +27,12 @@ const createUser = async (userData) => {
     return user;
 
 }
+
+const hashedPassword = async (password) => {
+    //Hash password
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+};
 
 const findUserById = async (id) => {
     return await prisma.user.findUnique({
@@ -125,4 +129,5 @@ export default {
     getUserCount,
     updateUser,
     deleteUser,
+    hashedPassword,
 };

@@ -8,7 +8,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Rest API",
+            "name": "Server",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -17,7 +17,7 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch React App (Vite)",
+            "name": "Client",
             "url": "http://localhost:5173",
             "webRoot": "${workspaceFolder}/react-client",
             "preLaunchTask": "npm: dev"
